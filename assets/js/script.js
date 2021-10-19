@@ -5,6 +5,7 @@ const pageContentEl = document.querySelector('#page-content');
 const tasksInProgressEl = document.querySelector("#tasks-in-progress");
 const tasksCompletedEl = document.querySelector("#tasks-completed");
 
+const tasks =[]
 const taskFormHandler = function(event) {
     event.preventDefault();
 
@@ -28,7 +29,8 @@ const taskFormHandler = function(event) {
     else {
         const taskDataObj = {
             name: taskNameInput,
-            type: taskTypeInput
+            type: taskTypeInput,
+            status: "to do"
         };
         createTaskEl(taskDataObj);
     }
@@ -48,6 +50,10 @@ const createTaskEl = function(taskDataObj) {
 
     //add div to li
     listItemEl.appendChild(taskInfoEl);
+    //grabbing id
+    taskDataObj.id = taskIdCounter;
+    //pushing to task array 
+    tasks.push(taskDataObj);
 
    const taskActionsEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionsEl);
@@ -55,6 +61,7 @@ const createTaskEl = function(taskDataObj) {
     tasksToDoEl.appendChild(listItemEl);
     //increment for unique id
     taskIdCounter++;
+
 };
 
 const createTaskActions = function(taskId) {
@@ -112,6 +119,17 @@ const taskButtonHandler = function(event) {
 const deleteTask = function(taskId) {
     const taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
     taskSelected.remove();
+
+    const updatedTaskArr = [];
+
+    // loop through current tasks
+    for(var i = 0; i <tasks.length; i++) {
+        if(tasks[i].id !== parseInt(taskId)) {
+            updatedTaskArr.push(tasks[i]);
+        }
+    }
+
+    tasks= updatedTaskArr
 };
 
 const editTask = function(taskId) {
@@ -134,7 +152,13 @@ const completeEditTask = function(taskName, taskType, taskId) {
     // set new values
     taskSelected.querySelector('h3.task-name').textContent = taskName;
     taskSelected.querySelector('span.task-type').textContent = taskType;
-
+// confirms task we want to update 
+    for(var i = 0; i<tasks.length; i++) {
+        if(tasks[i].id === parseInt(taskId)) {
+            tasks[i].name = taskName;
+            tasks[i].type = taskType;
+        }
+    };
     alert("Task Updated!")
 
     //reset form by removing taskId and changing button text back to normal
@@ -157,6 +181,12 @@ const taskStatusChangeHandler = function(event) {
     }
     else if (statusValue === "completed") {
         tasksCompletedEl.appendChild(taskSelected);
+    }
+
+    for(var i = 0; i < tasks.length; i++) {
+        if(tasks[i].id === parseInt(taskId)) {
+            tasks[i].status = statusValue;
+        }
     }
 }
 
